@@ -93,6 +93,22 @@ class APIServicesDHCPdUpdate extends APIModel {
                 # Format this interface's CIDR
                 $if_cidr = $this->__if_conf["ipaddr"]."/".$this->__if_conf["subnet"];
 
+                # DEBUG FOR #488
+                file_put_contents(
+                    "/tmp/dhcpd_update_debug.log",
+                    "initial_data: ".json_encode($this->initial_data).PHP_EOL
+                );
+                file_put_contents(
+                    "/tmp/dhcpd_update_debug.log",
+                    "validated_data: ".json_encode($this->validated_data).PHP_EOL,
+                    FILE_APPEND
+                );
+                file_put_contents(
+                    "/tmp/dhcpd_update_debug.log",
+                    "php_input: ".json_encode(file_get_contents('php://input')).PHP_EOL,
+                    FILE_APPEND
+                );
+
                 # Ensure our range_from is within our available range
                 if (APITools\is_ipv4_in_cidr($this->initial_data["range_from"], $if_cidr)) {
                     $this->validated_data["range"]["from"] = $this->initial_data["range_from"];
