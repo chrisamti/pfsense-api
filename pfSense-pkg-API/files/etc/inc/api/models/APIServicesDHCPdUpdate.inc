@@ -60,11 +60,22 @@ class APIServicesDHCPdUpdate extends APIModel {
             # Check that interface exists
             if (is_string($this->initial_data["interface"])) {
                 $this->__if_conf = $this->get_config("interfaces/{$this->initial_data["interface"]}", []);
+                # DEBUG FOR #488
+                file_put_contents(
+                    "/tmp/dhcpd_update_debug.log",
+                    "before_if_check: ".json_encode($this->__if_conf).PHP_EOL
+                );
                 # Check that interface hosts a static network with multiple addresses
                 if (isset($this->__if_conf["enable"]) and is_ipaddrv4($this->__if_conf["ipaddr"]) and $this->__if_conf["subnet"] <= 31) {
                     $this->id = $this->initial_data["interface"];
                     $this->__init_config($this->id);
                     $this->validated_data = $this->get_config("dhcpd/{$this->id}", []);
+                    # DEBUG FOR #488
+                    file_put_contents(
+                        "/tmp/dhcpd_update_debug.log",
+                        "after_if_check: ".json_encode($this->__if_conf).PHP_EOL,
+                        FILE_APPEND
+                    );
                 } else {
                     $this->errors[] = APIResponse\get(2019);
                 }
@@ -96,16 +107,7 @@ class APIServicesDHCPdUpdate extends APIModel {
                 # DEBUG FOR #488
                 file_put_contents(
                     "/tmp/dhcpd_update_debug.log",
-                    "initial_data: ".json_encode($this->initial_data).PHP_EOL
-                );
-                file_put_contents(
-                    "/tmp/dhcpd_update_debug.log",
-                    "validated_data: ".json_encode($this->validated_data).PHP_EOL,
-                    FILE_APPEND
-                );
-                file_put_contents(
-                    "/tmp/dhcpd_update_debug.log",
-                    "php_input: ".json_encode(file_get_contents('php://input')).PHP_EOL,
+                    "before_ipv4_in_cidr: ".json_encode($this->__if_conf).PHP_EOL,
                     FILE_APPEND
                 );
 
